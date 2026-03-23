@@ -1,4 +1,4 @@
-package com.example.embeddedandroidphotopicker
+package com.example.naturentdecker
 
 import org.junit.Test
 

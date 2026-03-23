@@ -1,4 +1,4 @@
-package com.example.embeddedandroidphotopicker
+package com.example.naturentdecker
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
