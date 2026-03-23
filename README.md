@@ -4,14 +4,6 @@ Android app for the "Naturentdecker" National Park providing information about g
 
 ---
 
-## Screens
-
-| Portrait – Tour List | Portrait – Tour Detail | Landscape – Two Pane |
-|---|---|---|
-| All tours + Top 5 tab | Hero image, stats, animals | List + detail side by side |
-
----
-
 ## Architecture
 
 ```
