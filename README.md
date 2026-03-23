@@ -4,6 +4,13 @@ Android app for the "Naturentdecker" National Park providing information about g
 
 ---
 
+
+https://github.com/user-attachments/assets/287695da-3303-408f-a003-bcefa0055c80
+
+
+
+
+
 ## Architecture
 
 ```
