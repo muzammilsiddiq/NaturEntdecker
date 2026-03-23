@@ -1,6 +1,8 @@
 package com.example.naturentdecker.ui.tourdetail
 
+import androidx.lifecycle.viewmodel.compose.viewModel
 import app.cash.turbine.test
+import com.example.naturentdecker.data.model.Contact
 import com.example.naturentdecker.data.model.Tour
 import com.example.naturentdecker.data.usecases.GetContactUseCase
 import com.example.naturentdecker.data.usecases.GetTourDetailUseCase
@@ -43,6 +45,13 @@ class TourDetailViewModelTest {
 
     )
 
+    private val contact = Contact(
+        companyName = "Test Company",
+        phone = "123456789",
+        street = "Test Street",
+        country = "Test Country",
+    )
+
     @Before
     fun setup() {
         Dispatchers.setMain(testDispatcher)
@@ -59,6 +68,8 @@ class TourDetailViewModelTest {
 
     @Test
     fun `initial state is empty`() = runTest {
+        coEvery { getContactUseCase() } returns Result.Success(contact)
+
         viewModel = createViewModel()
 
         viewModel.uiState.test {
@@ -73,6 +84,7 @@ class TourDetailViewModelTest {
     @Test
     fun `loadTour shows tour from cache`() = runTest {
         every { getTourDetailUseCase(1) } returns flowOf(fakeTour)
+        coEvery { getContactUseCase() } returns Result.Success(contact)
         coEvery { getTourDetailUseCase.refresh(1) } returns Result.Success(Unit)
 
         viewModel = createViewModel()
@@ -91,6 +103,7 @@ class TourDetailViewModelTest {
     fun `loadTour sets isLoading false after load`() = runTest {
         every { getTourDetailUseCase(1) } returns flowOf(fakeTour)
         coEvery { getTourDetailUseCase.refresh(1) } returns Result.Success(Unit)
+        coEvery { getContactUseCase() } returns Result.Success(contact)
 
         viewModel = createViewModel()
         viewModel.loadTour(1)
@@ -107,6 +120,7 @@ class TourDetailViewModelTest {
         every { getTourDetailUseCase(1) } returns flowOf(null)
         coEvery { getTourDetailUseCase.refresh(1) } returns
                 Result.Error(AppException.NetworkException())
+        coEvery { getContactUseCase() } returns Result.Success(contact)
 
         viewModel = createViewModel()
         viewModel.loadTour(1)
@@ -125,6 +139,7 @@ class TourDetailViewModelTest {
         every { getTourDetailUseCase(1) } returns flowOf(fakeTour)
         coEvery { getTourDetailUseCase.refresh(1) } returns
                 Result.Error(AppException.NetworkException())
+        coEvery { getContactUseCase() } returns Result.Success(contact)
 
         viewModel = createViewModel()
         viewModel.loadTour(1)
@@ -141,6 +156,7 @@ class TourDetailViewModelTest {
     fun `loadTour called twice with same id is no-op second time`() = runTest {
         every { getTourDetailUseCase(1) } returns flowOf(fakeTour)
         coEvery { getTourDetailUseCase.refresh(1) } returns Result.Success(Unit)
+        coEvery { getContactUseCase() } returns Result.Success(contact)
 
         viewModel = createViewModel()
         viewModel.loadTour(1)
@@ -159,6 +175,7 @@ class TourDetailViewModelTest {
     fun `loadTour calls refresh with correct id`() = runTest {
         every { getTourDetailUseCase(42) } returns flowOf(fakeTour)
         coEvery { getTourDetailUseCase.refresh(42) } returns Result.Success(Unit)
+        coEvery { getContactUseCase() } returns Result.Success(contact)
 
         viewModel = createViewModel()
         viewModel.loadTour(42)
@@ -172,6 +189,7 @@ class TourDetailViewModelTest {
         every { getTourDetailUseCase(1) } returns flowOf(null)
         coEvery { getTourDetailUseCase.refresh(1) } returns
                 Result.Error(AppException.ServerException(404, "Not Found"))
+        coEvery { getContactUseCase() } returns Result.Success(contact)
 
         viewModel = createViewModel()
         viewModel.loadTour(1)
@@ -188,6 +206,7 @@ class TourDetailViewModelTest {
     fun `clear resets tour to null`() = runTest {
         every { getTourDetailUseCase(1) } returns flowOf(fakeTour)
         coEvery { getTourDetailUseCase.refresh(1) } returns Result.Success(Unit)
+        coEvery { getContactUseCase() } returns Result.Success(contact)
 
         viewModel = createViewModel()
         viewModel.loadTour(1)
@@ -205,6 +224,7 @@ class TourDetailViewModelTest {
         every { getTourDetailUseCase(1) } returns flowOf(null)
         coEvery { getTourDetailUseCase.refresh(1) } returns
                 Result.Error(AppException.NetworkException())
+        coEvery { getContactUseCase() } returns Result.Success(contact)
 
         viewModel = createViewModel()
         viewModel.loadTour(1)
@@ -219,6 +239,8 @@ class TourDetailViewModelTest {
 
     @Test
     fun `clear resets isLoading to false`() = runTest {
+        coEvery { getContactUseCase() } returns Result.Success(contact)
+
         viewModel = createViewModel()
         viewModel.clear()
 
@@ -232,6 +254,7 @@ class TourDetailViewModelTest {
     fun `after clear loadTour can load again`() = runTest {
         every { getTourDetailUseCase(1) } returns flowOf(fakeTour)
         coEvery { getTourDetailUseCase.refresh(1) } returns Result.Success(Unit)
+        coEvery { getContactUseCase() } returns Result.Success(contact)
 
         viewModel = createViewModel()
         viewModel.loadTour(1)
