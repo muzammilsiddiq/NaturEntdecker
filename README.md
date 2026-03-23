@@ -1,4 +1,4 @@
-# NaturEntdecker – Imaginary National Park
+# NaturEntdecker 
 
 Android app for the "Naturentdecker" National Park providing information about guided animal safaris bookable via the park hotline.
 
