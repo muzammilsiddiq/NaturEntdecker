@@ -1,85 +1,87 @@
 package com.example.naturentdecker.features.tour.list
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.PrimaryTabRow
+import com.example.naturentdecker.R
+import androidx.compose.material3.Tab
+import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.example.naturentdecker.data.model.Tour
+import com.example.naturentdecker.ui.components.ErrorState
+import com.example.naturentdecker.ui.components.ShimmerTourList
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ToursListScreen(
     uiState: ToursUiState,
     onTourClick: (Int) -> Unit,
     onToggleTop5: () -> Unit,
-    onRetry: () -> Unit,
+    onRefresh: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier.fillMaxSize()) {
-        TabRow(selectedTabIndex = if (uiState.showTop5) 1 else 0) {
+        PrimaryTabRow(selectedTabIndex = if (uiState.showTop5) 1 else 0) {
             Tab(
                 selected = !uiState.showTop5,
                 onClick = { if (uiState.showTop5) onToggleTop5() },
-                text = { Text("All Tours") }
+                text = { Text(stringResource(R.string.tab_all_tours)) }
             )
             Tab(
                 selected = uiState.showTop5,
                 onClick = { if (!uiState.showTop5) onToggleTop5() },
-                text = { Text("Top 5") }
+                text = { Text(stringResource(R.string.tab_top_5)) }
             )
         }
 
         when {
-            uiState.isLoading -> {
-                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
-                }
+            uiState.isLoading && uiState.tours.isEmpty() -> {
+                ShimmerTourList()
             }
 
-            uiState.error != null -> {
-                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(12.dp),
-                        modifier = Modifier.padding(32.dp)
-                    ) {
-                        Text(
-                            "Couldn't load tours",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.SemiBold
-                        )
-                        Text(
-                            uiState.error,
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                        Button(onClick = onRetry) { Text("Retry") }
-                    }
-                }
-            }
-
-            uiState.tours.isEmpty() -> {
-                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text("No tours available", style = MaterialTheme.typography.bodyLarge)
-                }
+            uiState.error != null && uiState.tours.isEmpty() -> {
+                ErrorState(
+                    message = uiState.error,
+                    onRetry = onRefresh,
+                )
             }
 
             else -> {
-                LazyColumn(
-                    contentPadding = PaddingValues(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                PullToRefreshBox(
+                    isRefreshing = uiState.isRefreshing,
+                    onRefresh = onRefresh,
+                    modifier = Modifier.fillMaxSize(),
                 ) {
-                    items(uiState.tours, key = { it.id }) { tour ->
-                        TourCard(tour = tour, onClick = { onTourClick(tour.id.toInt()) })
+                    LazyColumn(
+                        contentPadding = PaddingValues(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                        modifier = Modifier.fillMaxSize(),
+                    ) {
+                        items(uiState.tours, key = { it.id }) { tour ->
+                            TourCard(tour = tour, onClick = { onTourClick(tour.id) })
+                        }
                     }
                 }
             }
@@ -94,10 +96,10 @@ fun TourCard(tour: Tour, onClick: () -> Unit) {
             .fillMaxWidth()
             .clickable(onClick = onClick),
         elevation = CardDefaults.cardElevation(defaultElevation = 3.dp),
-        shape = MaterialTheme.shapes.medium
+        shape = MaterialTheme.shapes.medium,
     ) {
         Column {
-            if (tour.thumb.isNotBlank()) {
+            if (!tour.thumb.isNullOrEmpty()) {
                 AsyncImage(
                     model = tour.thumb,
                     contentDescription = tour.title,
@@ -105,31 +107,31 @@ fun TourCard(tour: Tour, onClick: () -> Unit) {
                         .fillMaxWidth()
                         .height(160.dp)
                         .clip(MaterialTheme.shapes.medium),
-                    contentScale = ContentScale.Crop
+                    contentScale = ContentScale.Crop,
                 )
             }
+
             Column(modifier = Modifier.padding(12.dp)) {
                 Text(
                     text = tour.title,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
                 )
 
                 Spacer(Modifier.height(6.dp))
 
-                Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                    tour.price.let { priceStr ->
-                        Spacer(Modifier.height(8.dp))
-                        val formattedPrice = priceStr.toDoubleOrNull()?.let { "€%.2f".format(it) } ?: "€$priceStr"
-                        Text(
-                            text = formattedPrice,
-                            style = MaterialTheme.typography.titleSmall,
-                            color = MaterialTheme.colorScheme.primary,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
+                tour.price.let {
+                    val price = it.toDoubleOrNull()?.let { p -> "€%.2f".format(p) } ?: "€$it"
+
+                    Spacer(Modifier.height(8.dp))
+                    Text(
+                        text = price,
+                        style = MaterialTheme.typography.titleSmall,
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.Bold,
+                    )
                 }
             }
         }

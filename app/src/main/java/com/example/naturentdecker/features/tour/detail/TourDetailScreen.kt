@@ -1,5 +1,7 @@
 package com.example.naturentdecker.features.tour.detail
 
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -12,9 +14,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.example.naturentdecker.R
 import com.example.naturentdecker.data.model.Tour
 import com.example.naturentdecker.utils.DateUtils
 
@@ -31,7 +36,8 @@ fun TourDetailScreen(
                 TopAppBar(
                     title = {
                         Text(
-                            text = uiState.tour?.title ?: "Tour Detail",
+                            text = uiState.tour?.title
+                                ?: stringResource(R.string.tour_detail_default_title),
                             maxLines = 1
                         )
                     },
@@ -39,7 +45,7 @@ fun TourDetailScreen(
                         IconButton(onClick = onBack) {
                             Icon(
                                 Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = "Back"
+                                contentDescription = stringResource(R.string.back)
                             )
                         }
                     },
@@ -56,7 +62,9 @@ fun TourDetailScreen(
         when {
             uiState.isLoading -> {
                 Box(
-                    Modifier.fillMaxSize().padding(padding),
+                    Modifier
+                        .fillMaxSize()
+                        .padding(padding),
                     contentAlignment = Alignment.Center
                 ) {
                     CircularProgressIndicator()
@@ -65,7 +73,9 @@ fun TourDetailScreen(
 
             uiState.error != null -> {
                 Box(
-                    Modifier.fillMaxSize().padding(padding),
+                    Modifier
+                        .fillMaxSize()
+                        .padding(padding),
                     contentAlignment = Alignment.Center
                 ) {
                     Column(
@@ -80,7 +90,7 @@ fun TourDetailScreen(
                             tint = MaterialTheme.colorScheme.error
                         )
                         Text(
-                            "Couldn't load tour details",
+                            stringResource(R.string.tour_detail_error_title),
                             style = MaterialTheme.typography.titleMedium
                         )
                         Text(
@@ -95,7 +105,10 @@ fun TourDetailScreen(
             uiState.tour != null -> {
                 TourDetailContent(
                     tour = uiState.tour,
-                    modifier = Modifier.fillMaxSize().padding(padding)
+                    contactPhone = uiState.contactPhone,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(padding)
                 )
             }
         }
@@ -103,10 +116,19 @@ fun TourDetailScreen(
 }
 
 @Composable
-fun TourDetailContent(tour: Tour, modifier: Modifier = Modifier) {
+fun TourDetailContent(
+    modifier: Modifier = Modifier,
+    tour: Tour,
+    contactPhone: String? = null,
+) {
+    val context = LocalContext.current
+
+    val priceLabel = stringResource(R.string.stat_label_price)
+    val datesLabel = stringResource(R.string.stat_label_dates)
+
     Column(modifier = modifier.verticalScroll(rememberScrollState())) {
 
-        if (tour.thumb.isNotEmpty()) {
+        if (!tour.thumb.isNullOrEmpty()) {
             AsyncImage(
                 model = tour.thumb,
                 contentDescription = tour.title,
@@ -127,10 +149,14 @@ fun TourDetailContent(tour: Tour, modifier: Modifier = Modifier) {
 
             Spacer(Modifier.height(16.dp))
 
-            // Stats grid
             val statsItems = buildList {
-                val formattedPrice = tour.price.toDoubleOrNull()?.let { "€%.2f".format(it) } ?: "€${tour.price}"
-                add(Pair(Icons.Default.Euro, "Price" to formattedPrice))
+                tour.price.let {
+                    val price = it.toDoubleOrNull()?.let { p -> "€%.2f".format(p) } ?: "€$it"
+                    add(Pair(Icons.Default.Euro, priceLabel to price))
+                }
+                val dateRange = DateUtils.formatTourDateRange(tour.startDate, tour.endDate)
+                add(Pair(Icons.Default.CalendarMonth, datesLabel to dateRange))
+
             }
 
             if (statsItems.isNotEmpty()) {
@@ -139,7 +165,12 @@ fun TourDetailContent(tour: Tour, modifier: Modifier = Modifier) {
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     statsItems.chunked(2).take(1).flatten().forEach { (icon, pair) ->
-                        StatCard(icon = icon, label = pair.first, value = pair.second, modifier = Modifier.weight(1f))
+                        StatCard(
+                            icon = icon,
+                            label = pair.first,
+                            value = pair.second,
+                            modifier = Modifier.weight(1f)
+                        )
                     }
                 }
                 Spacer(Modifier.height(8.dp))
@@ -149,7 +180,12 @@ fun TourDetailContent(tour: Tour, modifier: Modifier = Modifier) {
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         chunk.forEach { (icon, pair) ->
-                            StatCard(icon = icon, label = pair.first, value = pair.second, modifier = Modifier.weight(1f))
+                            StatCard(
+                                icon = icon,
+                                label = pair.first,
+                                value = pair.second,
+                                modifier = Modifier.weight(1f)
+                            )
                         }
                         if (chunk.size == 1) Spacer(Modifier.weight(1f))
                     }
@@ -157,10 +193,10 @@ fun TourDetailContent(tour: Tour, modifier: Modifier = Modifier) {
                 }
             }
 
-            tour.shortDescription.let {
+            tour.shortDescription?.let {
                 Spacer(Modifier.height(8.dp))
                 Text(
-                    text = "About this Tour",
+                    text = stringResource(R.string.tour_detail_about_title),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold
                 )
@@ -172,28 +208,17 @@ fun TourDetailContent(tour: Tour, modifier: Modifier = Modifier) {
                 )
             }
 
-            val infoItems = buildList {
-                val dateRange = DateUtils.formatTourDateRange(tour.startDate, tour.endDate)
-                add("Tour Dates" to dateRange)
-            }
-
-            if (infoItems.isNotEmpty()) {
-                Spacer(Modifier.height(16.dp))
-                Text(
-                    text = "Tour Information",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold
-                )
-                Spacer(Modifier.height(8.dp))
-                infoItems.forEach { (label, value) ->
-                    DetailRow(label = label, value = value)
-                }
-            }
-
             Spacer(Modifier.height(24.dp))
 
-            // Booking CTA
             Card(
+                onClick = {
+                    if (!contactPhone.isNullOrBlank()) {
+                        val intent = Intent(Intent.ACTION_DIAL).apply {
+                            data = Uri.parse("tel:$contactPhone")
+                        }
+                        context.startActivity(intent)
+                    }
+                },
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer
                 ),
@@ -212,13 +237,14 @@ fun TourDetailContent(tour: Tour, modifier: Modifier = Modifier) {
                     )
                     Column {
                         Text(
-                            text = "Book this Tour",
+                            text = stringResource(R.string.booking_card_title),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onPrimaryContainer
                         )
                         Text(
-                            text = "Call our hotline to reserve your spot on this guided safari.",
+                            text = if (!contactPhone.isNullOrBlank()) contactPhone
+                            else stringResource(R.string.booking_card_fallback_subtitle),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onPrimaryContainer
                         )
@@ -268,27 +294,4 @@ private fun StatCard(
             }
         }
     }
-}
-
-@Composable
-private fun DetailRow(label: String, value: String) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Text(
-            text = label,
-            style = MaterialTheme.typography.bodyMedium,
-            fontWeight = FontWeight.Medium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-        Text(
-            text = value,
-            style = MaterialTheme.typography.bodyMedium,
-            fontWeight = FontWeight.SemiBold
-        )
-    }
-    HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
 }

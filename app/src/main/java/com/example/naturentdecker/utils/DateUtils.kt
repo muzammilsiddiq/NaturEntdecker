@@ -1,34 +1,45 @@
 package com.example.naturentdecker.utils
 
-import java.text.SimpleDateFormat
+import java.time.OffsetDateTime
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeParseException
 import java.util.Locale
-import java.util.TimeZone
 
 object DateUtils {
-    private val isoFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX", Locale.US).apply {
-        timeZone = TimeZone.getTimeZone("UTC")
-    }
-    
-    private val displayFormat = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
 
-    fun formatIsoDate(isoString: String?): String {
-        if (isoString.isNullOrBlank()) return ""
-        return try {
-            val date = isoFormat.parse(isoString)
-            if (date != null) displayFormat.format(date) else isoString
-        } catch (e: Exception) {
-            isoString
+    private val isoParser: DateTimeFormatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME
+
+    private val displayFormatter: DateTimeFormatter =
+        DateTimeFormatter.ofPattern("MMM dd, yyyy", Locale.getDefault())
+
+    private val shortFormatter: DateTimeFormatter =
+        DateTimeFormatter.ofPattern("MMM dd", Locale.getDefault())
+
+    fun formatTourDateRange(startDate: String?, endDate: String?): String {
+        val start = parseOrNull(startDate)
+        val end = parseOrNull(endDate)
+
+        return when {
+            start != null && end != null -> {
+                if (start.year == end.year) {
+                    "${shortFormatter.format(start)} - ${displayFormatter.format(end)}"
+                } else {
+                    "${displayFormatter.format(start)} - ${displayFormatter.format(end)}"
+                }
+            }
+            start != null -> displayFormatter.format(start)
+            end != null -> displayFormatter.format(end)
+            else -> "Date TBD"
         }
     }
 
-    fun formatTourDateRange(startDate: String?, endDate: String?): String {
-        val start = formatIsoDate(startDate)
-        val end = formatIsoDate(endDate)
-        return when {
-            start.isNotEmpty() && end.isNotEmpty() -> "$start - $end"
-            start.isNotEmpty() -> start
-            end.isNotEmpty() -> end
-            else -> "Date TBD"
+    private fun parseOrNull(isoString: String?): OffsetDateTime? {
+        if (isoString.isNullOrBlank()) return null
+        return try {
+            OffsetDateTime.parse(isoString, isoParser)
+        } catch (e: DateTimeParseException) {
+            null
         }
     }
 }

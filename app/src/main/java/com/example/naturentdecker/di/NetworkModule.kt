@@ -26,7 +26,6 @@ import kotlin.jvm.java
 object NetworkModule {
     
     private const val BASE_URL = "https://bitsfabrik.com/projekte/imaginary/api/"
-    private const val CACHE_SIZE = 50 * 1024 * 1024L
     private const val CONNECT_TIMEOUT_SECONDS = 30L
     private const val READ_TIMEOUT_SECONDS = 30L
     private const val WRITE_TIMEOUT_SECONDS = 30L
@@ -38,16 +37,7 @@ object NetworkModule {
             .add(KotlinJsonAdapterFactory())
             .build()
     }
-    
-    @Provides
-    @Singleton
-    fun provideCache(
-        @ApplicationContext context: Context
-    ): Cache {
-        val cacheDir = File(context.cacheDir, "http_cache")
-        return Cache(cacheDir, CACHE_SIZE)
-    }
-    
+
     @Provides
     @Singleton
     fun provideAcceptJsonInterceptor(): AcceptJsonInterceptor {
@@ -65,12 +55,10 @@ object NetworkModule {
     @Provides
     @Singleton
     fun provideOkHttpClient(
-        cache: Cache,
         acceptJsonInterceptor: AcceptJsonInterceptor,
         loggingInterceptor: LoggingInterceptor
     ): OkHttpClient {
         return OkHttpClient.Builder()
-            .cache(cache)
             .addInterceptor(acceptJsonInterceptor)
             .addInterceptor(loggingInterceptor)
             .connectTimeout(CONNECT_TIMEOUT_SECONDS, TimeUnit.SECONDS)

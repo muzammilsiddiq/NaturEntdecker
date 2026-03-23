@@ -6,8 +6,9 @@ import com.squareup.moshi.JsonClass
 data class Tour(
     val id: Int,
     val title: String,
-    val shortDescription: String,
-    val thumb: String,
+    val shortDescription: String?,
+    val description: String?,
+    val thumb: String?,
     val startDate: String,
     val endDate: String,
     val price: String
