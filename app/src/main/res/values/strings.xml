@@ -1,3 +1,19 @@
 <resources>
-    <string name="app_name">Embedded Android Photo Picker</string>
+    <string name="app_name">NaturEntdecker</string>
+
+    <string name="tab_all_tours">All Tours</string>
+    <string name="tab_top_5">Top 5</string>
+
+    <string name="tour_detail_default_title">Tour Detail</string>
+    <string name="back">Back</string>
+
+    <string name="tour_detail_error_title">Couldn\'t load tour details</string>
+
+    <string name="tour_detail_about_title">About this Tour</string>
+
+    <string name="stat_label_price">Price</string>
+    <string name="stat_label_dates">Dates</string>
+
+    <string name="booking_card_title">Book this Tour</string>
+    <string name="booking_card_fallback_subtitle">Call our hotline to reserve your spot.</string>
 </resources>

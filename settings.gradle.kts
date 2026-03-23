@@ -16,8 +16,9 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        gradlePluginPortal()
     }
 }
 
-rootProject.name = "Embedded Android(Photo Picker"
+rootProject.name = "NaturEntdecker"
 include(":app")
