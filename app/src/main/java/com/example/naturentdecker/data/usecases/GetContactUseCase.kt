@@ -1,6 +1,6 @@
 package com.example.naturentdecker.data.usecases
 
-import com.example.naturentdecker.data.TourRepository
+import com.example.naturentdecker.data.repository.TourRepository
 import com.example.naturentdecker.data.model.Contact
 import com.example.naturentdecker.utils.Result
 import javax.inject.Inject

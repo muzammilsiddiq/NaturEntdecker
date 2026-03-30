@@ -1,6 +1,5 @@
 package com.example.naturentdecker.ui.tourdetail
 
-import androidx.lifecycle.viewmodel.compose.viewModel
 import app.cash.turbine.test
 import com.example.naturentdecker.data.model.Contact
 import com.example.naturentdecker.data.model.Tour
@@ -21,7 +20,10 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
 

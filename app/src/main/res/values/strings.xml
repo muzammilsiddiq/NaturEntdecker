@@ -16,4 +16,5 @@
 
     <string name="booking_card_title">Book this Tour</string>
     <string name="booking_card_fallback_subtitle">Call our hotline to reserve your spot.</string>
+    <string name="couldn_t_load_tours">Couldn\'t load tours</string>
 </resources>

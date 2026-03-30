@@ -30,8 +30,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.example.naturentdecker.data.model.Tour
+import com.example.naturentdecker.data.model.formattedPrice
 import com.example.naturentdecker.ui.components.ErrorState
 import com.example.naturentdecker.ui.components.ShimmerTourList
+import com.example.naturentdecker.utils.formatAsPrice
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -122,17 +124,13 @@ fun TourCard(tour: Tour, onClick: () -> Unit) {
 
                 Spacer(Modifier.height(6.dp))
 
-                tour.price.let {
-                    val price = it.toDoubleOrNull()?.let { p -> "€%.2f".format(p) } ?: "€$it"
-
-                    Spacer(Modifier.height(8.dp))
-                    Text(
-                        text = price,
-                        style = MaterialTheme.typography.titleSmall,
-                        color = MaterialTheme.colorScheme.primary,
-                        fontWeight = FontWeight.Bold,
-                    )
-                }
+                Spacer(Modifier.height(8.dp))
+                Text(
+                    text = tour.formattedPrice,
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.Bold,
+                )
             }
         }
     }

@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.example.naturentdecker.R
 import com.example.naturentdecker.data.model.Tour
+import com.example.naturentdecker.data.model.formattedPrice
 import com.example.naturentdecker.utils.DateUtils
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -150,46 +151,30 @@ fun TourDetailContent(
             Spacer(Modifier.height(16.dp))
 
             val statsItems = buildList {
-                tour.price.let {
-                    val price = it.toDoubleOrNull()?.let { p -> "€%.2f".format(p) } ?: "€$it"
-                    add(Pair(Icons.Default.Euro, priceLabel to price))
-                }
+                add(Pair(Icons.Default.Euro, priceLabel to tour.formattedPrice))
                 val dateRange = DateUtils.formatTourDateRange(tour.startDate, tour.endDate)
                 add(Pair(Icons.Default.CalendarMonth, datesLabel to dateRange))
 
             }
 
             if (statsItems.isNotEmpty()) {
+                val dateRange = DateUtils.formatTourDateRange(tour.startDate, tour.endDate)
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    statsItems.chunked(2).take(1).flatten().forEach { (icon, pair) ->
-                        StatCard(
-                            icon = icon,
-                            label = pair.first,
-                            value = pair.second,
-                            modifier = Modifier.weight(1f)
-                        )
-                    }
-                }
-                Spacer(Modifier.height(8.dp))
-                statsItems.drop(2).chunked(2).forEach { chunk ->
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        chunk.forEach { (icon, pair) ->
-                            StatCard(
-                                icon = icon,
-                                label = pair.first,
-                                value = pair.second,
-                                modifier = Modifier.weight(1f)
-                            )
-                        }
-                        if (chunk.size == 1) Spacer(Modifier.weight(1f))
-                    }
-                    Spacer(Modifier.height(8.dp))
+                    StatCard(
+                        icon = Icons.Default.Euro,
+                        label = priceLabel,
+                        value = tour.formattedPrice,
+                        modifier = Modifier.weight(1f)
+                    )
+                    StatCard(
+                        icon = Icons.Default.CalendarMonth,
+                        label = datesLabel,
+                        value = dateRange,
+                        modifier = Modifier.weight(1f)
+                    )
                 }
             }
 

@@ -46,7 +46,7 @@ class TourDetailViewModel @Inject constructor(
         if (currentId == id) return
         currentId = id
 
-        _uiState.update { TourDetailUiState(isLoading = true) }
+        _uiState.update { it.copy(isLoading = true, error = null, tour = null) }
 
         observeJob?.cancel()
         observeJob = getTourDetailUseCase(id)
@@ -71,7 +71,6 @@ class TourDetailViewModel @Inject constructor(
             when (val result = getContactUseCase()) {
                 is Result.Success -> _uiState.update { it.copy(contactPhone = result.data.phone) }
                 is Result.Error -> Timber.w(result.exception, "Could not load contact info")
-                else -> Unit
             }
         }
     }

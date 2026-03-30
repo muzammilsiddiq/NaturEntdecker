@@ -5,9 +5,8 @@ import com.example.naturentdecker.data.local.dao.TourDao
 import com.example.naturentdecker.data.local.entity.TourEntity
 import com.example.naturentdecker.data.model.Tour
 import com.example.naturentdecker.data.remote.api.ToursApiService
+import com.example.naturentdecker.data.repository.TourRepository
 import com.example.naturentdecker.utils.Result
-import com.squareup.moshi.Moshi
-import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
@@ -26,7 +25,6 @@ class ToursRepositoryTest {
     private lateinit var api: ToursApiService
     private lateinit var db: NaturEntdeckerDatabase
     private lateinit var dao: TourDao
-    private lateinit var moshi: Moshi
     private lateinit var repository: TourRepository
 
     private val apiTours = listOf(
@@ -64,7 +62,6 @@ class ToursRepositoryTest {
         api = mockk()
         db = mockk()
         dao = mockk(relaxed = true)
-        moshi = Moshi.Builder().addLast(KotlinJsonAdapterFactory()).build()
         every { db.tourDao() } returns dao
         repository = TourRepository(api, db)
     }

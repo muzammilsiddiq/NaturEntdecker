@@ -30,4 +30,18 @@ interface TourDao {
 
     @Query("SELECT cachedAt FROM tour ORDER BY cachedAt DESC LIMIT 1")
     suspend fun getLastCacheTime(): Long?
+
+    @Transaction
+    suspend fun replaceAllTop5Tours(newTours: List<TourEntity>) {
+        clearTop5Tours()
+        upsertTours(newTours)
+    }
+
+    @Transaction
+    suspend fun replaceAllTopTours(newTours: List<TourEntity>) {
+        clearAllTours()
+        upsertTours(newTours)
+    }
+
+
 }

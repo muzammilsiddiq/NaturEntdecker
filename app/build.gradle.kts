@@ -57,6 +57,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.material)
     implementation(libs.timber)
     implementation(libs.androidx.compose.material.icons.extended)
 
@@ -71,7 +72,6 @@ dependencies {
     implementation(libs.hilt.navigation.compose)
 
     implementation(libs.moshi)
-    implementation(libs.moshi.kotlin)
     implementation(libs.moshi.adapters)
     ksp(libs.moshi.kotlin.codegen)
 
