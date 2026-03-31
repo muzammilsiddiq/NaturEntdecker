@@ -22,5 +22,6 @@ object DatabaseModule {
             NaturEntdeckerDatabase::class.java,
             "naturentdecker.db"
         )
+            .fallbackToDestructiveMigration(true)
             .build()
 }

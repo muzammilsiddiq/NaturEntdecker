@@ -1,4 +1,4 @@
-package com.example.naturentdecker.data
+package com.example.naturentdecker.data.repository
 
 import com.example.naturentdecker.data.local.NaturEntdeckerDatabase
 import com.example.naturentdecker.data.local.toDomain
@@ -33,21 +33,30 @@ class TourRepository @Inject constructor(
         dao.getTourById(id).map { it?.toDomain() }
 
     suspend fun refreshAllTours(): Result<Unit> {
+        if (!isCacheStale()) {
+            Timber.d("Cache is fresh, skipping network call")
+            return Result.Success(Unit)
+        }
+
         Timber.d("Refreshing all tours from network")
         return safeApiCall {
             val tours = api.getAllTours()
-            dao.clearAllTours()
-            dao.upsertTours(tours.map { it.toEntity(isTop5 = false) })
+            dao.replaceAllTopTours(tours.map { it.toEntity(isTop5 = false) })
             Timber.d("Cached ${tours.size} tours")
         }
     }
 
     suspend fun refreshTop5Tours(): Result<Unit> {
+        if (!isCacheStale()) {
+            Timber.d("Cache is fresh, skipping network call")
+            return Result.Success(Unit)
+        }
+
         Timber.d("Refreshing top5 tours from network")
         return safeApiCall {
             val tours = api.getTop5Tours()
-            dao.clearTop5Tours()
-            dao.upsertTours(tours.map { it.toEntity(isTop5 = true) })
+            dao.replaceAllTop5Tours(tours.map { it.toEntity(isTop5 = true) })
+            Timber.d("Cached ${tours.size} tours")
         }
     }
 

@@ -8,7 +8,7 @@ import com.example.naturentdecker.data.local.entity.TourEntity
 @Database(
     entities = [TourEntity::class],
     version = 1,
-    exportSchema = true,
+    exportSchema = false, // Temporarily set to false avoid warning
 )
 abstract class NaturEntdeckerDatabase : RoomDatabase() {
     abstract fun tourDao(): TourDao

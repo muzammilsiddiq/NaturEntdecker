@@ -1,6 +1,7 @@
 package com.example.naturentdecker.data
 
 import com.example.naturentdecker.data.model.Tour
+import com.example.naturentdecker.data.repository.TourRepository
 import com.example.naturentdecker.data.usecases.GetAllToursUseCase
 import com.example.naturentdecker.data.usecases.GetTop5ToursUseCase
 import com.example.naturentdecker.data.usecases.GetTourDetailUseCase

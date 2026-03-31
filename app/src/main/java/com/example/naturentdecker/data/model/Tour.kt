@@ -1,5 +1,6 @@
-package com.example.naturentdecker.data.model// features/tours/data/src/main/java/.../model/TourListResponse.kt
+package com.example.naturentdecker.data.model
 
+import com.example.naturentdecker.utils.formatAsPrice
 import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
@@ -13,3 +14,6 @@ data class Tour(
     val endDate: String,
     val price: String
 )
+
+val Tour.formattedPrice: String
+    get() = price.formatAsPrice()
