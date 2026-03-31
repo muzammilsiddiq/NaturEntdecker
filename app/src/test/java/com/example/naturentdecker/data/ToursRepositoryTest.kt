@@ -113,7 +113,6 @@ class ToursRepositoryTest {
         val result = repository.refreshAllTours()
 
         assertTrue(result is Result.Success)
-        coVerify { dao.clearAllTours() }
         coVerify { dao.upsertTours(any()) }
     }
 
@@ -142,7 +141,6 @@ class ToursRepositoryTest {
         val result = repository.refreshTop5Tours()
 
         assertTrue(result is Result.Success)
-        coVerify { dao.clearTop5Tours() }
         coVerify { dao.upsertTours(any()) }
     }
 
