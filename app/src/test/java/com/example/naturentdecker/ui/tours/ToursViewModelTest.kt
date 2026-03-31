@@ -108,18 +108,6 @@ class ToursViewModelTest {
     }
 
     @Test
-    fun `initial state has showTop5 false`() = runTest {
-        viewModel = createViewModel()
-        testDispatcher.scheduler.advanceUntilIdle()
-
-        viewModel.uiState.test {
-            val state = awaitItem()
-            assertFalse(state.showTop5)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
     fun `initial state has no error on success`() = runTest {
         viewModel = createViewModel()
         testDispatcher.scheduler.advanceUntilIdle()

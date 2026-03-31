@@ -37,7 +37,7 @@ object DateUtils {
         if (isoString.isNullOrBlank()) return null
         return try {
             OffsetDateTime.parse(isoString, isoParser)
-        } catch (e: DateTimeParseException) {
+        } catch (_: DateTimeParseException) {
             null
         }
     }

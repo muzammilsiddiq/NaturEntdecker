@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -21,6 +22,7 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
@@ -40,20 +42,26 @@ import com.example.naturentdecker.utils.formatAsPrice
 fun ToursListScreen(
     uiState: ToursUiState,
     onTourClick: (Int) -> Unit,
-    onToggleTop5: () -> Unit,
+    onTabSelected: (TourTab) -> Unit,
     onRefresh: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val listState = rememberLazyListState()
+
+    LaunchedEffect(uiState.selectedTab) {
+        listState.animateScrollToItem(0)
+    }
+
     Column(modifier = modifier.fillMaxSize()) {
-        PrimaryTabRow(selectedTabIndex = if (uiState.showTop5) 1 else 0) {
+        PrimaryTabRow(selectedTabIndex = if (uiState.selectedTab is TourTab.All) 0 else 1) {
             Tab(
-                selected = !uiState.showTop5,
-                onClick = { if (uiState.showTop5) onToggleTop5() },
+                selected = uiState.selectedTab is TourTab.All,
+                onClick = { onTabSelected(TourTab.All) },
                 text = { Text(stringResource(R.string.tab_all_tours)) }
             )
             Tab(
-                selected = uiState.showTop5,
-                onClick = { if (!uiState.showTop5) onToggleTop5() },
+                selected = uiState.selectedTab is TourTab.Top5,
+                onClick = { onTabSelected(TourTab.Top5) },
                 text = { Text(stringResource(R.string.tab_top_5)) }
             )
         }
@@ -77,6 +85,7 @@ fun ToursListScreen(
                     modifier = Modifier.fillMaxSize(),
                 ) {
                     LazyColumn(
+                        state = listState,
                         contentPadding = PaddingValues(16.dp),
                         verticalArrangement = Arrangement.spacedBy(12.dp),
                         modifier = Modifier.fillMaxSize(),
@@ -124,7 +133,6 @@ fun TourCard(tour: Tour, onClick: () -> Unit) {
 
                 Spacer(Modifier.height(6.dp))
 
-                Spacer(Modifier.height(8.dp))
                 Text(
                     text = tour.formattedPrice,
                     style = MaterialTheme.typography.titleSmall,

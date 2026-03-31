@@ -7,5 +7,5 @@ data class ToursUiState(
     val isRefreshing: Boolean = false,
     val tours: List<Tour> = emptyList(),
     val error: String? = null,
-    val showTop5: Boolean = false,
+    val selectedTab: TourTab = TourTab.All,
 )
