@@ -109,7 +109,7 @@ class ToursRepositoryTest {
     @Test
     fun `refreshAllTours returns Success and writes to cache`() = runTest {
         coEvery { api.getAllTours() } returns apiTours
-        coEvery { dao.getLastCacheTime() } returns null
+        coEvery { dao.getLastCacheTimeAllTours() } returns null
 
         val result = repository.refreshAllTours()
 
@@ -138,7 +138,7 @@ class ToursRepositoryTest {
     @Test
     fun `refreshTop5Tours returns Success and writes top5 entities`() = runTest {
         coEvery { api.getTop5Tours() } returns apiTours.take(1)
-        coEvery { dao.getLastCacheTime() } returns null
+        coEvery { dao.getLastCacheTimeTop5Tours() } returns null
 
         val result = repository.refreshTop5Tours()
 
@@ -182,24 +182,24 @@ class ToursRepositoryTest {
 
     @Test
     fun `isCacheStale returns true when cache is empty`() = runTest {
-        coEvery { dao.getLastCacheTime() } returns null
+        coEvery { dao.getLastCacheTimeAllTours() } returns null
 
-        assertTrue(repository.isCacheStale())
+        assertTrue(repository.isCacheStale(false))
     }
 
     @Test
     fun `isCacheStale returns true when cache is older than 5 minutes`() = runTest {
         val sixMinutesAgo = System.currentTimeMillis() - (6 * 60 * 1000L)
-        coEvery { dao.getLastCacheTime() } returns sixMinutesAgo
+        coEvery { dao.getLastCacheTimeAllTours() } returns sixMinutesAgo
 
-        assertTrue(repository.isCacheStale())
+        assertTrue(repository.isCacheStale(false))
     }
 
     @Test
     fun `isCacheStale returns false when cache is fresh`() = runTest {
         val oneMinuteAgo = System.currentTimeMillis() - (1 * 60 * 1000L)
-        coEvery { dao.getLastCacheTime() } returns oneMinuteAgo
+        coEvery { dao.getLastCacheTimeAllTours() } returns oneMinuteAgo
 
-        assertFalse(repository.isCacheStale())
+        assertFalse(repository.isCacheStale(false))
     }
 }
