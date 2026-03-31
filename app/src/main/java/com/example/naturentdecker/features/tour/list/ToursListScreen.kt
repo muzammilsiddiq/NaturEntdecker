@@ -133,7 +133,6 @@ fun TourCard(tour: Tour, onClick: () -> Unit) {
 
                 Spacer(Modifier.height(6.dp))
 
-                Spacer(Modifier.height(8.dp))
                 Text(
                     text = tour.formattedPrice,
                     style = MaterialTheme.typography.titleSmall,
