@@ -109,11 +109,12 @@ class ToursRepositoryTest {
     @Test
     fun `refreshAllTours returns Success and writes to cache`() = runTest {
         coEvery { api.getAllTours() } returns apiTours
+        coEvery { dao.getLastCacheTime() } returns null
 
         val result = repository.refreshAllTours()
 
         assertTrue(result is Result.Success)
-        coVerify { dao.upsertTours(any()) }
+        coVerify { dao.replaceAllTopTours(any()) }
     }
 
     @Test
@@ -137,11 +138,12 @@ class ToursRepositoryTest {
     @Test
     fun `refreshTop5Tours returns Success and writes top5 entities`() = runTest {
         coEvery { api.getTop5Tours() } returns apiTours.take(1)
+        coEvery { dao.getLastCacheTime() } returns null
 
         val result = repository.refreshTop5Tours()
 
         assertTrue(result is Result.Success)
-        coVerify { dao.upsertTours(any()) }
+        coVerify { dao.replaceAllTop5Tours(any()) }
     }
 
     @Test
