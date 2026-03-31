@@ -7,6 +7,42 @@ on:
     branches: [ main ]
 
 jobs:
+  pr-description:
+    name: Auto PR Description
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate PR description
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: files } = await github.rest.pulls.listFiles({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+            });
+
+            const summary = files.map(f => {
+              const icon = f.status === 'added' ? '🆕' : f.status === 'removed' ? '🗑️' : '✏️';
+              return `${icon} \`${f.filename}\` (+${f.additions} -${f.deletions})`;
+            }).join('\n');
+
+            const body = `## Changes\n\n${summary}\n\n**${files.length}** file(s) changed`;
+
+            await github.rest.pulls.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+              body: body,
+            });
+
   lint:
     name: Lint
     runs-on: ubuntu-latest
