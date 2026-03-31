@@ -33,7 +33,7 @@ class TourRepository @Inject constructor(
         dao.getTourById(id).map { it?.toDomain() }
 
     suspend fun refreshAllTours(): Result<Unit> {
-        if (!isCacheStale()) {
+        if (!isCacheStale(isTop5 = false)) {
             Timber.d("Cache is fresh, skipping network call")
             return Result.Success(Unit)
         }
@@ -47,7 +47,7 @@ class TourRepository @Inject constructor(
     }
 
     suspend fun refreshTop5Tours(): Result<Unit> {
-        if (!isCacheStale()) {
+        if (!isCacheStale(isTop5 = true)) {
             Timber.d("Cache is fresh, skipping network call")
             return Result.Success(Unit)
         }
@@ -70,8 +70,12 @@ class TourRepository @Inject constructor(
 
     suspend fun getContact(): Result<Contact> = safeApiCall { api.getContact() }
 
-    suspend fun isCacheStale(): Boolean {
-        val lastCache = dao.getLastCacheTime() ?: return true
+    suspend fun isCacheStale(isTop5: Boolean): Boolean {
+        val lastCache: Long? =
+            if (isTop5) dao.getLastCacheTimeTop5Tours() else dao.getLastCacheTimeAllTours()
+
+        lastCache ?: return true
+
         return System.currentTimeMillis() - lastCache > CACHE_EXPIRY_MS
     }
 }

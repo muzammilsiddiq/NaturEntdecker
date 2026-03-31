@@ -12,7 +12,8 @@ data class Tour(
     val thumb: String?,
     val startDate: String,
     val endDate: String,
-    val price: String
+    val price: String,
+    val isTop5: Boolean = false,
 )
 
 val Tour.formattedPrice: String

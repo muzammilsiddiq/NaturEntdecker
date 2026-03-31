@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface TourDao {
 
-    @Query("SELECT * FROM tour WHERE isTop5 = 0 ORDER BY startDate ASC")
+    @Query("SELECT * FROM tour ORDER BY startDate ASC")
     fun getAllTours(): Flow<List<TourEntity>>
 
     @Query("SELECT * FROM tour WHERE isTop5 = 1 ORDER BY startDate ASC")
@@ -28,8 +28,11 @@ interface TourDao {
     @Query("DELETE FROM tour WHERE isTop5 = 1")
     suspend fun clearTop5Tours()
 
-    @Query("SELECT cachedAt FROM tour ORDER BY cachedAt DESC LIMIT 1")
-    suspend fun getLastCacheTime(): Long?
+    @Query("SELECT cachedAt FROM tour WHERE isTop5 = 0 ORDER BY cachedAt DESC LIMIT 1")
+    suspend fun getLastCacheTimeAllTours(): Long?
+
+    @Query("SELECT cachedAt FROM tour WHERE isTop5 = 1 ORDER BY cachedAt DESC LIMIT 1")
+    suspend fun getLastCacheTimeTop5Tours(): Long?
 
     @Transaction
     suspend fun replaceAllTop5Tours(newTours: List<TourEntity>) {

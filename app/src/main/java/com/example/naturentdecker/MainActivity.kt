@@ -24,6 +24,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.naturentdecker.features.tour.detail.TourDetailScreen
 import com.example.naturentdecker.features.tour.detail.TourDetailViewModel
+import com.example.naturentdecker.features.tour.list.TourTab
 import com.example.naturentdecker.features.tour.list.ToursListScreen
 import com.example.naturentdecker.features.tour.list.ToursUiState
 import com.example.naturentdecker.features.tour.list.ToursViewModel
@@ -54,13 +55,13 @@ fun NaturEntdeckerHome() {
     if (isLandscape) {
         LandscapeLayout(
             toursUiState = toursUiState,
-            onToggleTop5 = toursViewModel::toggleTop5,
+            onTabSelected = toursViewModel::onTabSelected,
             onRefresh = toursViewModel::refresh,
         )
     } else {
         PortraitLayout(
             toursUiState = toursUiState,
-            onToggleTop5 = toursViewModel::toggleTop5,
+            onTabSelected = toursViewModel::onTabSelected,
             onRefresh = toursViewModel::refresh,
         )
     }
@@ -70,7 +71,7 @@ fun NaturEntdeckerHome() {
 @Composable
 private fun PortraitLayout(
     toursUiState: ToursUiState,
-    onToggleTop5: () -> Unit,
+    onTabSelected: (TourTab) -> Unit,
     onRefresh: () -> Unit,
 ) {
     val navController = rememberNavController()
@@ -91,7 +92,7 @@ private fun PortraitLayout(
                 ToursListScreen(
                     uiState = toursUiState,
                     onTourClick = { id -> navController.navigate("tour/$id") },
-                    onToggleTop5 = onToggleTop5,
+                    onTabSelected = onTabSelected,
                     onRefresh = onRefresh,
                     modifier = Modifier.padding(padding),
                 )
@@ -120,7 +121,7 @@ private fun PortraitLayout(
 @Composable
 private fun LandscapeLayout(
     toursUiState: ToursUiState,
-    onToggleTop5: () -> Unit,
+    onTabSelected: (TourTab) -> Unit,
     onRefresh: () -> Unit,
 ) {
     var selectedTourId by remember { mutableStateOf<Int?>(null) }
@@ -154,7 +155,7 @@ private fun LandscapeLayout(
                         selectedTourId = id
                         detailViewModel.loadTour(id)
                     },
-                    onToggleTop5 = onToggleTop5,
+                    onTabSelected = onTabSelected,
                     onRefresh = onRefresh,
                 )
             }
@@ -191,7 +192,7 @@ private fun EmptyDetailPlaceholder() {
         )
         Spacer(Modifier.height(16.dp))
         Text(
-            text = "Select a tour to see details",
+            text = stringResource(R.string.select_a_tour_to_see_details),
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )

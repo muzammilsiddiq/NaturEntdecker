@@ -28,5 +28,6 @@ fun TourEntity.toDomain(): Tour {
         thumb = thumb,
         startDate = startDate,
         endDate = endDate,
+        isTop5 = isTop5,
     )
 }
